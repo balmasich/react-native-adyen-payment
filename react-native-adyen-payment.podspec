@@ -17,6 +17,9 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.dependency "React"
-	s.dependency "Adyen","3.3.0"
+  s.dependency "Adyen"
+  # s.dependency "Adyen/ApplePay"
+  # s.dependency "Adyen/WeChatPay"
+
 end
 
