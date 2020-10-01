@@ -542,7 +542,6 @@ class AdyenPayment: RCTEventEmitter {
                 while let presentedViewController = topController.presentedViewController {
                     topController = presentedViewController
                 }
-                component.viewController.modalPresentationStyle = .fullScreen
                 topController.present(component.viewController, animated: true)
             }
         }
