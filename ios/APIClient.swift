@@ -42,27 +42,52 @@ internal final class APIClient {
         
         requestCounter += 1
         
-        urlSession.dataTask(with: urlRequest) { result in
-            switch result {
-            case let .success(data):
-                print(" ---- Response (/\(request.path)) ----")
-                printAsJSON(data)
-                
-                do {
-                    let response = try Coder.decode(data) as R.ResponseType
-                    print(" ---- SuccessFully DEcoded ) ----")
-                    completionHandler(.success(response))
-                } catch {
-                    print("APIClient Decoder error: \(error).")
-                    completionHandler(.failure(error))
-                }
-            case let .failure(error):
+//    urlSession.dataTask(with: urlRequest) { result in
+//        switch result {
+//        case let .success(data):
+//            print(" ---- Response (/\(request.path)) ----")
+//            printAsJSON(data)
+//
+//            do {
+//                let response = try Coder.decode(data) as R.ResponseType
+//                print(" ---- SuccessFully DEcoded ) ----")
+//                completionHandler(.success(response))
+//            } catch {
+//                print("APIClient Decoder error: \(error).")
+//                completionHandler(.failure(error))
+//            }
+//        case let .failure(error):
+//            print("API Failure error: \(error).")
+//            completionHandler(.failure(error))
+//        }
+//
+//        self.requestCounter -= 1
+//    }.resume()
+        
+        
+        urlSession.dataTask(with: urlRequest) { data, response, error in
+            if let error = error {
                 print("API Failure error: \(error).")
                 completionHandler(.failure(error))
+                return
             }
-            
+            guard let data = data, let _ = response as? HTTPURLResponse else {
+                completionHandler(.failure(error!))
+                return
+            }
+            print(" ---- Response (/\(request.path)) ----")
+            printAsJSON(data)
+            do {
+                let response = try Coder.decode(data) as R.ResponseType
+                print(" ---- SuccessFully DEcoded ) ----")
+                completionHandler(.success(response))
+            } catch {
+                print("APIClient Decoder error: \(error).")
+                completionHandler(.failure(error))
+            }
             self.requestCounter -= 1
         }.resume()
+
     }
     
     private lazy var urlSession: URLSession = {

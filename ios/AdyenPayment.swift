@@ -106,7 +106,7 @@ class AdyenPayment: RCTEventEmitter {
                 configuration.card.publicKey = cardComponent["card_public_key"] as? String
                 self.showDropInComponent(configuration: configuration)
             }else{
-                let component = CardComponent(paymentMethod: paymentMethod, publicKey:(cardComponent["card_public_key"] as! String), style: self.formComponentStyle as! AnyFormComponentStyle, navigationStyle: self.navigationStyle!)
+                let component = CardComponent(paymentMethod: paymentMethod, publicKey:(cardComponent["card_public_key"] as! String))
                 self.present(component)
             }
         }
@@ -127,7 +127,7 @@ class AdyenPayment: RCTEventEmitter {
                guard let paymentMethod = self.paymentMethods?.paymentMethod(ofType: BCMCPaymentMethod.self) else { return }
             let bcmcComponent : [String:Any] = componentData["bcmc"] as? [String:Any] ?? [:]
             if(!bcmcComponent.isEmpty){
-                let component = BCMCComponent(paymentMethod: paymentMethod, publicKey: bcmcComponent["card_public_key"] as! String, style: self.formComponentStyle as! AnyFormComponentStyle, navigationStyle: self.navigationStyle!)
+                let component = BCMCComponent(paymentMethod: paymentMethod, publicKey: bcmcComponent["card_public_key"] as! String)
                     component.delegate = self
                     self.present(component)
                 }
@@ -231,15 +231,15 @@ class AdyenPayment: RCTEventEmitter {
     }
     
     func paymentMethodsResponseHandler(result: Result<PaymentMethodsResponse, Error>) {
-            self.removeSpinner()
-            switch result {
-            case let .success(response):
-                self.paymentMethods = response.paymentMethods
-                self.startPayment(self.component!,componentData: self.componentData!)
-            case let .failure(error):
-                //self.sendFailure(code :"ERROR_GENERAL",message: error.localizedDescription)
-                self.presentAlert(withTitle:"Error",message: error.localizedDescription)
-            }
+        self.removeSpinner()
+        switch result {
+        case let .success(response):
+            self.paymentMethods = response.paymentMethods
+            self.startPayment(self.component!,componentData: self.componentData!)
+        case let .failure(error):
+            //self.sendFailure(code :"ERROR_GENERAL",message: error.localizedDescription)
+            self.presentAlert(withTitle:"Error",message: error.localizedDescription)
+        }
     }
 
     func sendSuccess(message : Dictionary<String, Any>?){
@@ -476,6 +476,8 @@ class AdyenPayment: RCTEventEmitter {
             performThreeDS2Fingerprint(with: threeDS2FingerprintAction)
         case let .threeDS2Challenge(threeDS2ChallengeAction):
             performThreeDS2Challenge(with: threeDS2ChallengeAction)
+        case .sdk(_): break
+            
         }
     }
     
